@@ -1,14 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <climits>
-#include <utility>
-#include <queue>
-#include <set>
-#include <assert.h>
-
-using namespace std;
-
+#include "bellman.h"
 // write function bf() to calculate 1 step of the Bellman-Ford on the input graph
 /*
 The Graph
@@ -30,43 +20,54 @@ path separate by a whitespace for example: "A D C B" representing the path going
 to D to C and then B. (Datatype string)
 • The Start and Goal are type char. The Vertices will always be named using the uppercase
 alphabet in order where vertex 0th is ’A’, 1st is ’B’, and so on. (Datatype char)*/
-
-template <size_t N>
-void BF(int (&graph)[N][N], int numOfVertex, char start, int *value, int *prev)
+static const int INF = 2147483647;
+void BF(int graph[20][20], int numOfVertex, char start, int *value, int *prev)
 {
     // Initialize the value of the start vertex to 0
     // every value must be set to infinity
-    for (int i = 0; i < numOfVertex; i++)
-    {
-        if (i != start - 'A')
-        {
-            value[i] = INT_MAX;
-        }
-    }
-    value[start - 'A'] = 0;
-    prev[start - 'A'] = -1;
-
-    cout << "Start: " << start << endl;
+    // cout << "Start: " << start << endl;
     // Relax edges numOfVertex - 1 times
+    static int step = 0;
+
+    if (step == 0)
+    {
+        for (int i = 0; i < numOfVertex; i++)
+        {
+            value[i] = INF;
+            prev[i] = -1;
+        }
+        value[start - 'A'] = 0;
+    }
     for (int u = 0; u < numOfVertex; u++)
     {
         for (int v = 0; v < numOfVertex; v++)
         {
-            if (graph[u][v] != 0 && graph[u][v] != INT_MAX && value[u] != INT_MAX && value[u] + graph[u][v] < value[v])
+            if (graph[u][v] != 0 && value[u] != INF && value[u] + graph[u][v] < value[v])
             {
-                cout << "before update:" << endl;
-                cout << u << " " << v << endl;
-                cout << value[u] << " " << graph[u][v] << " " << value[v] << endl;
                 value[v] = value[u] + graph[u][v];
-                cout << "after update:" << endl;
-                cout << value[u] << " " << graph[u][v] << " " << value[v] << endl;
                 prev[v] = u;
             }
         }
     }
+    // check for negative circle
+    if (step >= numOfVertex)
+    {
+        for (int u = 0; u < numOfVertex; u++)
+        {
+            for (int v = 0; v < numOfVertex; v++)
+            {
+                if (value[u] != INT_MAX && value[u] + graph[u][v] < value[v])
+                {
+                    return;
+                }
+            }
+        }
+        return;
+    }
+    step++;
 }
-template <size_t N>
-void BF_Path(int (&graph)[N][N], int num, char start, char goal)
+
+void BF_Path(int graph[20][20], int num, char start, char goal)
 {
     int value[num];
     int prev[num];
@@ -98,45 +99,41 @@ void BF_Path(int (&graph)[N][N], int num, char start, char goal)
         current = prev[current];
     }
     cout << path << endl;
-}
-
-void test_bf()
-{
-    int graph[6][6] = {
-        {0, 1, 4, 0, 0, 0},
-        {0, 0, 2, 2, 0, 0},
-        {0, 0, 0, 0, 3, 0},
-        {0, 0, 0, 0, 0, 2},
-        {0, 0, 0, 1, 0, 2},
-        {0, 0, 0, 0, 0, 0}};
-    int value[6];
-    int prev[6];
-    BF(graph, 6, 'A', value, prev);
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < num; i++)
     {
-        cout << value[i] << " ";
-    }
-    cout << endl;
-    for (int i = 0; i < 6; i++)
-    {
-        cout << prev[i] << " ";
+        for (int j = 0; j < num; j++)
+        {
+            cout << graph[i][j] << " ";
+            if (j == num - 1)
+            {
+                cout << endl;
+            }
+        }
     }
 }
 
 void test_bf2()
 {
-    int graph[8][8] = {
-        {0, 1, 2, 0, 0, 0, 0, 0},
-        {0, 0, 0, 2, 0, 0, 0, 0},
-        {0, 0, 0, 0, 3, 0, 0, 0},
-        {0, 0, 0, 0, 0, 4, 0, 0},
-        {0, 0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 0, 2},
-        {0, 0, 0, 0, 0, 0, 0, 3},
-        {0, 0, 0, 0, 0, 0, 0, 0}};
+    int graph[20][20] = {
+        {0, 72, 89, 77, 2, 58, 13, 69},
+        {77, 0, 69, 31, 57, 93, 83, 48},
+        {52, 21, 0, 62, 8, 77, 32, 14},
+        {33, 1, 40, 0, 72, 99, 72, 59},
+        {89, 24, 1, 61, 0, 12, 78, 63},
+        {36, 91, 98, 79, 26, 0, 28, 1},
+        {18, 77, 49, 36, 98, 77, 0, 45},
+        {75, 9, 59, 7, 77, 65, 45, 0}};
     int value[8];
     int prev[8];
-    BF(graph, 8, 'A', value, prev);
+    for (int i = 0; i < 8; i++)
+    {
+        value[i] = -1;
+        prev[i] = -1;
+    }
+    for (int i = 0; i < 7; i++)
+    {
+        BF(graph, 8, 'D', value, prev);
+    }
     for (int i = 0; i < 8; i++)
     {
         cout << value[i] << " ";
@@ -146,11 +143,15 @@ void test_bf2()
     {
         cout << prev[i] << " ";
     }
+    /*
+    33 1 36 0 35 47 46 48
+    3 3 4 -1 0 4 0 5
+*/
 }
 
 void test_bf3()
 {
-    int graph[8][8] = {
+    int graph[20][20] = {
         {0, 1, 2, 0, 0, 0, 0, 0},
         {0, 0, 0, 2, 3, 0, 0, 0},
         {0, 0, 0, 0, 0, 4, 5, 0},
@@ -170,7 +171,7 @@ void test_bf3()
 
 void test_bf4()
 {
-    int graph[8][8] = {
+    int graph[20][20] = {
         {0, 0, 0, 33, 0, 0, 0, 0}, // A
         {0, 0, 0, 3, 0, 0, 0, 0},  // B
         {0, 0, 0, 40, 0, 0, 0, 0}, // C
@@ -196,7 +197,7 @@ void test_bf4()
 
 void test_bf6()
 {
-    int graph[4][4] = {
+    int graph[20][20] = {
         {0, 5, 0, 0}, // A
         {0, 0, 2, 0}, // B
         {0, 0, 0, 3}, // C
@@ -218,7 +219,7 @@ void test_bf6()
 
 void test_bf_path()
 {
-    int graph[10][10] = {
+    int graph[20][20] = {
         {0, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // A
         {0, 0, 2, 0, 0, 0, 0, 0, 0, 0}, // B
         {0, 0, 0, 3, 0, 0, 0, 0, 0, 0}, // C
@@ -235,9 +236,24 @@ void test_bf_path()
     BF_Path(graph, 10, 'A', 'J');
 }
 
+// void BF_Path(int graph[20][20], int num, char start, char goal)
+// {
+//     for (int i = 0; i < num; i++)
+//     {
+//         for (int j = 0; j < num; j++)
+//         {
+//             cout << graph[i][j] << " ";
+//             if (j == num - 1)
+//             {
+//                 cout << endl;
+//             }
+//         }
+//     }
+// }
+
 int main()
 {
-    test_bf_path();
+    test_bf2();
     return 0;
     // print the value and prev out
 }
