@@ -20,96 +20,125 @@ path separate by a whitespace for example: "A D C B" representing the path going
 to D to C and then B. (Datatype string)
 • The Start and Goal are type char. The Vertices will always be named using the uppercase
 alphabet in order where vertex 0th is ’A’, 1st is ’B’, and so on. (Datatype char)*/
-static const int INF = 2147483647;
-void BF(int graph[20][20], int numOfVertex, char start, int *value, int *prev)
+static int INF = 2147483647;
+void BF(int G[][20], int n, char start, int value[20], int prev[20])
 {
-    // Initialize the value of the start vertex to 0
-    // every value must be set to infinity
-    // cout << "Start: " << start << endl;
-    // Relax edges numOfVertex - 1 times
-    static int step = 0;
+    // Initialization step
+    int a = start - 'A';
+    value[a] = 0;
+    int count = 0;
 
-    if (step == 0)
+    for (int i = 0; i < n; i++)
     {
-        for (int i = 0; i < numOfVertex; i++)
-        {
-            value[i] = INF;
-            prev[i] = -1;
-        }
-        value[start - 'A'] = 0;
+        if (value[i] == -1)
+            count++;
     }
-    for (int u = 0; u < numOfVertex; u++)
+    if (count == n - 1)
     {
-        for (int v = 0; v < numOfVertex; v++)
+        // Set first value to the distance from start to other vertices, except itself
+        for (int i = 0; i < n; i++)
         {
-            if (graph[u][v] != 0 && value[u] != INF && value[u] + graph[u][v] < value[v])
-            {
-                value[v] = value[u] + graph[u][v];
-                prev[v] = u;
-            }
+            if (i != a)
+                value[i] = G[a][i];
         }
-    }
-    // check for negative circle
-    if (step >= numOfVertex)
-    {
-        for (int u = 0; u < numOfVertex; u++)
+        // Set the prev
+        for (int i = 0; i < n; i++)
         {
-            for (int v = 0; v < numOfVertex; v++)
-            {
-                if (value[u] != INT_MAX && value[u] + graph[u][v] < value[v])
-                {
-                    return;
-                }
-            }
+            if (i != a)
+                prev[i] = a;
         }
         return;
     }
-    step++;
+    int prev_val[n];
+    int check[n];
+
+    for (int u = 0; u < n; u++)
+    {
+        for (int v = 0; v < n; v++)
+        {
+            if (G[u][v] != 0 && G[u][v] != INF)
+            {
+                if (check[u] != 1)
+                {
+                    int distance = value[u] + G[u][v];
+                    if (distance < value[v])
+                    {
+                        prev_val[v] = value[v];
+                        value[v] = distance;
+                        prev[v] = u;
+                        check[v] = 1;
+                    }
+                }
+                else
+                {
+                    int distance = prev_val[u] + G[u][v];
+                    if (distance < value[v])
+                    {
+                        prev_val[v] = value[v];
+                        value[v] = distance;
+                        prev[v] = u;
+                        check[v] = 1;
+                    }
+                }
+            }
+        }
+    }
 }
 
-void BF_Path(int graph[20][20], int num, char start, char goal)
+string BF_Path(int G[20][20], int num, char start, char goal)
 {
-    int value[num];
-    int prev[num];
-    BF(graph, num, start, value, prev);
-    // print the value and prev out
-    cout << "Value: ";
-    // for (int i = 0; i < num; i++)
-    // {
-    //     cout << value[i] << " ";
-    // }
-    // cout << endl;
-    // cout << "Prev: ";
-    // for (int i = 0; i < num; i++)
-    // {
-    //     cout << prev[i] << " ";
-    // }
-    // cout << endl;
-    // print the path
+    int BFValue[num];
+    int BFPrev[num];
+    for (int i = 0; i < num; i++)
+    {
+        BFValue[i] = INF; // Initialize all distances as infinite
+        BFPrev[i] = -1;   // Initialize all previous vertices as undefined
+    }
+
+    int a = start - 'A';
+    BFValue[a] = 0; // Distance from start to itself is 0
+
+    // Relaxation step
+    for (int i = 0; i < num - 1; i++)
+    {
+        for (int u = 0; u < num; u++)
+        {
+            for (int v = 0; v < num; v++)
+            {
+                if (G[u][v] != 0 && BFValue[u] != INF && BFValue[u] + G[u][v] < BFValue[v])
+                {
+                    BFValue[v] = BFValue[u] + G[u][v];
+                    BFPrev[v] = u;
+                }
+            }
+        }
+    }
+
+    // Check for negative cycles
+    for (int u = 0; u < num; u++)
+    {
+        for (int v = 0; v < num; v++)
+        {
+            if (G[u][v] != 0 && BFValue[u] != INF && BFValue[u] + G[u][v] < BFValue[v])
+            {
+                return 0;
+            }
+        }
+    }
     string path = "";
     int current = goal - 'A';
     while (current != -1)
     {
-        path = (char)(current + 'A') + path;
+
         // add a space between letters
-        if (prev[current] != -1)
+        if (BFPrev[current] != -1)
         {
             path = " " + path;
         }
-        current = prev[current];
+        path = (char)(current + 'A') + path;
+        current = BFPrev[current];
     }
-    cout << path << endl;
-    for (int i = 0; i < num; i++)
-    {
-        for (int j = 0; j < num; j++)
-        {
-            cout << graph[i][j] << " ";
-            if (j == num - 1)
-            {
-                cout << endl;
-            }
-        }
-    }
+    return path;
 }
 
 void test_bf2()
@@ -133,16 +162,19 @@ void test_bf2()
     for (int i = 0; i < 7; i++)
     {
         BF(graph, 8, 'D', value, prev);
+        cout << "Step " << i << ": " << endl;
+        for (int i = 0; i < 8; i++)
+        {
+            cout << value[i] << " ";
+        }
+        cout << endl;
+        for (int i = 0; i < 8; i++)
+        {
+            cout << prev[i] << " ";
+        }
+        cout << endl;
     }
-    for (int i = 0; i < 8; i++)
-    {
-        cout << value[i] << " ";
-    }
-    cout << endl;
-    for (int i = 0; i < 8; i++)
-    {
-        cout << prev[i] << " ";
-    }
+
     /*
     33 1 36 0 35 47 46 48
     3 3 4 -1 0 4 0 5
