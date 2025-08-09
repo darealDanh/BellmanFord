@@ -1,64 +1,63 @@
-#include <tsm.h>
+#include "tsm.h"
+// const static int INF = 2147483647;
 
-template <size_t N>
-string Travelling(int (&graph)[N][N], int n, char start)
+string Traveling(int adj[][20], int n, char start_vertex)
 {
-    // the travelling salesman problem
-    // initialize the dp array
-    int dp[1 << n][n];
+    // the traveling salemen problem optimal solution, dynamic programming
+    int value[1 << n][n];
+    int prev[1 << n][n];
     for (int i = 0; i < (1 << n); i++)
     {
         for (int j = 0; j < n; j++)
         {
-            dp[i][j] = INT_MAX;
+            value[i][j] = INF;
+            prev[i][j] = -1;
         }
     }
-    dp[1 << (start - 'A')][start - 'A'] = 0;
-    // start the dp
-    for (int i = 1; i < (1 << n); i++)
+    value[1 << (start_vertex - 'A')][start_vertex - 'A'] = 0;
+    for (int i = 0; i < (1 << n); i++)
     {
         for (int j = 0; j < n; j++)
         {
-            if (i & (1 << j))
+            if ((i & (1 << j)) == 0 && j != start_vertex - 'A')
+                continue;
+            for (int k = 0; k < n; k++)
             {
-                for (int k = 0; k < n; k++)
+                if ((i & (1 << k)) == 0 || k == j)
+                    continue;
+                if (value[i][j] > value[i ^ (1 << j)][k] + adj[k][j])
                 {
-                    if (i & (1 << k) && graph[k][j] != 0 && dp[i ^ (1 << j)][k] != INT_MAX)
-                    {
-                        dp[i][j] = min(dp[i][j], dp[i ^ (1 << j)][k] + graph[k][j]);
-                    }
+                    value[i][j] = value[i ^ (1 << j)][k] + adj[k][j];
+                    prev[i][j] = k;
                 }
             }
         }
     }
-    // find the minimum path
-    int min = INT_MAX;
-    int minIndex = -1;
+
+    int min_index = -1;
+    int min_value = INF;
     for (int i = 0; i < n; i++)
     {
-        if (dp[(1 << n) - 1][i] < min)
+        if (i != start_vertex - 'A' && value[(1 << n) - 1][i] + adj[i][start_vertex - 'A'] < min_value)
         {
-            min = dp[(1 << n) - 1][i];
-            minIndex = i;
+            min_value = value[(1 << n) - 1][i] + adj[i][start_vertex - 'A'];
+            min_index = i;
         }
     }
-    // print the path
     string path = "";
-    int current = minIndex;
-    int currentSet = (1 << n) - 1;
-    while (currentSet != 0)
+    int cur = (1 << n) - 1;
+    int cur_vertex = min_index;
+    while (cur_vertex != -1)
     {
-        path = (char)(current + 'A') + path;
-        int next = -1;
-        for (int i = 0; i < n; i++)
+        if (path != "")
         {
-            if (currentSet & (1 << i) && graph[i][current] != 0 && dp[currentSet][current] == dp[currentSet ^ (1 << current)][i] + graph[i][current])
-            {
-                next = i;
-                break;
-            }
+            path = " " + path;
         }
-        currentSet ^= (1 << current);
-        current = next;
+        path = (char)(cur_vertex + 'A') + path;
+        int next_vertex = prev[cur][cur_vertex];
+        cur ^= (1 << cur_vertex);
+        cur_vertex = next_vertex;
     }
+    path = path + " " + start_vertex;
+    return path;
 }

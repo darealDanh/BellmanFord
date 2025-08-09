@@ -1,0 +1,50 @@
+#####From a To a#####↩
+a↩
+#####From a To b#####↩
+a t G b↩
+#####From a To d#####↩
+a t G d↩
+#####From a To W#####↩
+a t G b W↩
+#####From a To X#####↩
+a t G b X↩
+#####From b To a#####↩
+b W V a↩
+#####From b To b#####↩
+b↩
+#####From b To d#####↩
+b t G d↩
+#####From b To W#####↩
+b W↩
+#####From b To X#####↩
+b X↩
+#####From d To a#####↩
+d I a↩
+#####From d To b#####↩
+d m x b↩
+#####From d To d#####↩
+d↩
+#####From d To W#####↩
+d I W↩
+#####From d To X#####↩
+d m x b X↩
+#####From W To a#####↩
+W V a↩
+#####From W To b#####↩
+W Q b↩
+#####From W To d#####↩
+W A t G d↩
+#####From W To W#####↩
+W↩
+#####From W To X#####↩
+W l k o X↩
+#####From X To a#####↩
+X V a↩
+#####From X To b#####↩
+X n G b↩
+#####From X To d#####↩
+X n G d↩
+#####From X To W#####↩
+X Q W↩
+#####From X To X#####↩
+X

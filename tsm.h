@@ -1,18 +1,6 @@
 #include <iostream>
-#include <vector>
-#include <climits>
-#include <queue>
-#include <stack>
-#include <list>
-#include <utility>
-#include <unordered_map>
-#include <unordered_set>
-#include <set>
-#include <map>
 #include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <cstdio>
-#include <cstdlib>
-
+#include <string>
 using namespace std;
+const static int INF = 2000000;
+string Traveling(int adj[][20], int num_vertices, char start_vertex);
