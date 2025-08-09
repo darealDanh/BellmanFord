@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // initiate this int main to run the code from tsm.cpp
 #include "tsm.cpp"
 #include "bellman.cpp"
@@ -135,4 +136,27 @@ int main()
     testTraveling2();
 
     return 0;
+=======
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     for (int j = 0; j < 10; j++)
+    //     {
+    //         if (i & (1 << j))
+    //         {
+    //             cout << i << " " << j << endl;
+    //             cout << i || 2;
+    //         }
+    //     }
+    // }
+    int i = 1;
+    int j = 2;
+    int s = i | j;
+    cout << s << endl;
+>>>>>>> e930574dc1679ad3e395b9e22682ab803ba75bed
 }
